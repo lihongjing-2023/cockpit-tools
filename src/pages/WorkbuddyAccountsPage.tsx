@@ -22,6 +22,7 @@ import { QuickSettingsPopover } from '../components/QuickSettingsPopover';
 import { useProviderAccountsPage } from '../hooks/useProviderAccountsPage';
 import { PlatformOverviewTabsHeader, PlatformOverviewTab } from '../components/platform/PlatformOverviewTabsHeader';
 import { WorkbuddyInstancesContent } from './WorkbuddyInstancesPage';
+import { DosageNotifyUsageStatus } from '../components/platform/DosageNotifyUsageStatus';
 
 const WORKBUDDY_FLOW_NOTICE_COLLAPSED_KEY = 'agtools.workbuddy.flow_notice_collapsed';
 const WORKBUDDY_CURRENT_ACCOUNT_ID_KEY = 'agtools.workbuddy.current_account_id';
@@ -331,13 +332,22 @@ export function WorkbuddyAccountsPage() {
 
   const renderUsageInfo = useCallback((account: WorkbuddyAccount) => {
     const usage = getWorkbuddyUsage(account);
-    if (!usage.dosageNotifyCode) return <span className="quota-empty">--</span>;
-    if (usage.isNormal) return <span className="quota-value high">{t('workbuddy.usageNormal', '正常')}</span>;
-    const msg = locale.startsWith('zh')
-      ? (usage.dosageNotifyZh || usage.dosageNotifyCode)
-      : (usage.dosageNotifyEn || usage.dosageNotifyCode);
-    return <span className="quota-value critical" title={msg}>{msg}</span>;
-  }, [locale, t]);
+    return (
+      <DosageNotifyUsageStatus
+        usage={usage}
+        locale={locale}
+        accountLabel={maskAccountText(getWorkbuddyAccountDisplayEmail(account))}
+        normalText={t('workbuddy.usageNormal', '正常')}
+        abnormalText={t('workbuddy.usageAbnormal', '异常')}
+        viewDetailText={t('workbuddy.usageViewDetail', '查看详情')}
+        detailTitle={t('workbuddy.usageDetailTitle', '用量状态详情')}
+        accountText={t('common.shared.columns.account', '账号')}
+        confirmText={t('common.confirm', '确认')}
+        closeText={t('common.close', '关闭')}
+        classPrefix="workbuddy"
+      />
+    );
+  }, [locale, maskAccountText, t]);
 
   const renderQuotaQuerySection = useCallback((account: WorkbuddyAccount, variant: 'card' | 'table') => {
     const model = getWorkbuddyOfficialQuotaModel(account);

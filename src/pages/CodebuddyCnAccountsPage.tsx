@@ -21,6 +21,7 @@ import { QuickSettingsPopover } from '../components/QuickSettingsPopover';
 import { useProviderAccountsPage } from '../hooks/useProviderAccountsPage';
 import { PlatformOverviewTabsHeader, PlatformOverviewTab } from '../components/platform/PlatformOverviewTabsHeader';
 import { CodebuddyCnInstancesContent } from './CodebuddyCnInstancesPage';
+import { DosageNotifyUsageStatus } from '../components/platform/DosageNotifyUsageStatus';
 
 const CB_FLOW_NOTICE_COLLAPSED_KEY = 'agtools.codebuddycn.flow_notice_collapsed';
 const CB_CURRENT_ACCOUNT_ID_KEY = 'agtools.codebuddycn.current_account_id';
@@ -328,13 +329,22 @@ export function CodebuddyCnAccountsPage() {
 
   const renderUsageInfo = useCallback((account: CodebuddyAccount) => {
     const usage = getCodebuddyUsage(account);
-    if (!usage.dosageNotifyCode) return <span className="quota-empty">--</span>;
-    if (usage.isNormal) return <span className="quota-value high">{t('codebuddy.usageNormal', '正常')}</span>;
-    const msg = locale.startsWith('zh')
-      ? (usage.dosageNotifyZh || usage.dosageNotifyCode)
-      : (usage.dosageNotifyEn || usage.dosageNotifyCode);
-    return <span className="quota-value critical" title={msg}>{msg}</span>;
-  }, [locale, t]);
+    return (
+      <DosageNotifyUsageStatus
+        usage={usage}
+        locale={locale}
+        accountLabel={maskAccountText(getCodebuddyAccountDisplayEmail(account))}
+        normalText={t('codebuddy.usageNormal', '正常')}
+        abnormalText={t('codebuddy.usageAbnormal', '异常')}
+        viewDetailText={t('codebuddy.usageViewDetail', '查看详情')}
+        detailTitle={t('codebuddy.usageDetailTitle', '用量状态详情')}
+        accountText={t('common.shared.columns.account', '账号')}
+        confirmText={t('common.confirm', '确认')}
+        closeText={t('common.close', '关闭')}
+        classPrefix="codebuddy"
+      />
+    );
+  }, [locale, maskAccountText, t]);
 
   const renderQuotaQuerySection = useCallback((account: CodebuddyAccount, variant: 'card' | 'table') => {
     const model = getCodebuddyOfficialQuotaModel(account);

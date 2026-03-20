@@ -123,7 +123,7 @@ function toFiniteNumber(value: number | null | undefined): number | null {
 }
 
 export function DashboardPage({ onNavigate, onOpenPlatformLayout, onEasterEggTriggerClick }: DashboardPageProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   // 类型适配器，将 i18next 的 t 函数转换为简单的 (key, defaultValue?) => string 签名
   const tSimple = (key: string, defaultValue?: string) => t(key, defaultValue ?? key);
   const { orderedEntryIds, hiddenEntryIds, platformGroups } = usePlatformLayoutStore();
@@ -2246,15 +2246,10 @@ export function DashboardPage({ onNavigate, onOpenPlatformLayout, onEasterEggTri
     const usage = getCodebuddyUsage(account);
     const isRefreshing = refreshing.has(account.id);
     const isSwitching = switching.has(account.id);
-    const locale = i18n.language || 'zh-CN';
-    const usageStatusText = !usage.dosageNotifyCode
-      ? '--'
-      : usage.isNormal
-        ? t('codebuddy.usageNormal', '正常')
-        : locale.startsWith('zh')
-          ? (usage.dosageNotifyZh || usage.dosageNotifyCode)
-          : (usage.dosageNotifyEn || usage.dosageNotifyCode);
-    const usageStatusClass = !usage.dosageNotifyCode ? '' : (usage.isNormal ? 'high' : 'critical');
+    const usageStatusText = usage.isNormal
+      ? t('codebuddy.usageNormal', '正常')
+      : t('codebuddy.usageAbnormal', '异常');
+    const usageStatusClass = usage.isNormal ? 'high' : 'critical';
 
     return (
       <div className="account-mini-card">
